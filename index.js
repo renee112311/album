@@ -22,15 +22,20 @@ app.use(bodyParser.json())
 
 app.use(cors({
   origin (origin, callback) {
-    if (process.env.ALLOW_CORS === 'true') {
-      // 開發環境，允許
-      callback(null, true)
-    } else if (origin.includes('github')) {
-      // 非開發環境，但是從 github 過來，允許
+    // 直接開網頁時，不是ajax，origin是undefined
+    if (origin === undefined) {
       callback(null, true)
     } else {
-      // 不是開發也不是從 github 過來，拒絕
-      callback(new Error('Not allowed'), false)
+      if (process.env.ALLOW_CORS === 'true') {
+        // 開發環境，允許
+        callback(null, true)
+      } else if (origin.includes('github')) {
+        // 非開發環境，但是從 github 過來，允許
+        callback(null, true)
+      } else {
+        // 不是開發也不是從 github 過來，拒絕
+        callback(new Error('Not allowed'), false)
+      }
     }
   },
   credentials: true
